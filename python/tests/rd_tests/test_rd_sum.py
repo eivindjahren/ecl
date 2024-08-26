@@ -177,9 +177,12 @@ def test_to_from_pandas(summary):
         "TEST", baseline, dims=(smspec.nx, smspec.ny, smspec.nz)
     ).pandas_frame()
 
-    # round to hours
-    roundtrip.index = roundtrip.index.round(freq="H")
-    baseline.index = baseline.index.round(freq="H")
+    # There is quite a lot of loss of precision as the file format store dates
+    # as float32 in number of hours since start date. Also, this is first
+    # converted to float64 sim seconds in rd_sum_tstep and then to datetime64.
+    # Therefore we round to days before comparing.
+    roundtrip.index = roundtrip.index.round(freq="D")
+    baseline.index = baseline.index.round(freq="D")
 
     assert_frame_equal(
         roundtrip,
